@@ -1,4 +1,5 @@
 import random
+import getpass
 
 def buildMail(mailTo, mailFrom, recipientName, name):
 	header = 'To:' + mailTo + '\n' + 'From:' + mailFrom + '\n' + 'Subject: Kris Kindle\n\n'
@@ -9,16 +10,15 @@ def buildMail(mailTo, mailFrom, recipientName, name):
 	message = message + 'From your extrememly talented draw organiser!'
 	return header + message
 
-def sendMail(participant, name):
+def sendMail(participant, name, mailFrom, password):
 	import smtplib
-	mailFrom = 'johnorr123@gmail.com'
 	mailTo = participant[1]
 	recipientName = participant[0]
 	email = buildMail(mailTo, mailFrom, recipientName, name)
 	# Send the mail
 	server = smtplib.SMTP("smtp.gmail.com:587")
 	server.starttls()
-	server.login(mailFrom, 'brown chicken desk')
+	server.login(mailFrom, password) # "Allow less secure apps:" will have to be switched to ON in the account settings
 	server.sendmail(mailFrom, mailTo, email)
 	server.quit()
 	
@@ -63,9 +63,11 @@ def automaticDraw(people):
 		shuffledPeople.append(person[0])
 	random.shuffle(shuffledPeople)
 	i = 1
+	fromEmail = raw_input('Email to send from:')
+	password = getpass.getpass('Password:')
 	for person in people:
 		index = (shuffledPeople.index(person[0])+1)%len(shuffledPeople)
-		sendMail(person, shuffledPeople[index])
+		sendMail(person, shuffledPeople[index], fromEmail, password)
 		print 'Sent email number ' + str(i)
 		i = i + 1
 
